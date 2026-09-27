@@ -1,0 +1,66 @@
+name: SelectelSpeedtest
+options:
+  bundleIdPrefix: ru.rusjoan
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_IDENTITY: "-"
+
+targets:
+  SelectelSpeedtest:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+      - path: Shared
+    dependencies:
+      - target: SpeedtestWidget
+        embed: true
+    info:
+      path: Build/Info-Agent.plist
+      properties:
+        CFBundleDisplayName: Selectel Speedtest
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        LSUIElement: true
+        NSHumanReadableDescription: Фоновый агент, который регулярно измеряет скорость сети через Selectel Speedtest.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ru.rusjoan.selectel-speedtest
+        PRODUCT_NAME: SelectelSpeedtest
+
+  SpeedtestWidget:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: Widget
+      - path: Shared
+    info:
+      path: Build/Info-Widget.plist
+      properties:
+        CFBundleDisplayName: Selectel Speedtest Widget
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ru.rusjoan.selectel-speedtest.widget
+        PRODUCT_NAME: SpeedtestWidget
+        SKIP_INSTALL: true
+        CODE_SIGN_ENTITLEMENTS: Widget/SpeedtestWidget.entitlements
+
+schemes:
+  SelectelSpeedtest:
+    build:
+      targets:
+        SelectelSpeedtest: all
+        SpeedtestWidget: [build]
+    run:
+      config: Debug
