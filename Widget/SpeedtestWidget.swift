@@ -12,12 +12,16 @@ struct HistoryProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (HistoryEntry) -> Void) {
+        // процесс аппекса живёт долго: без reload() здесь и ниже он вечно отдавал бы
+        // снимок истории, прочитанный при старте процесса
+        MeasurementStore.shared.reload()
         completion(HistoryEntry(date: .now, results: MeasurementStore.shared.results))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<HistoryEntry>) -> Void) {
-        // Свежие данные агент проталкивает через WidgetCenter.reloadAllTimers();
+        // Свежие данные агент проталкивает через WidgetCenter.reloadAllTimelines();
         // .after — просто подстраховка на случай, если агент давно не обновлял виджет.
+        MeasurementStore.shared.reload()
         let entry = HistoryEntry(date: .now, results: MeasurementStore.shared.results)
         completion(Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(30 * 60))))
     }
